@@ -1,0 +1,15 @@
+{
+    "manifest_version": 3,
+    "name": "Orama Highlight Extension",
+    "version": "1.0",
+    "description": "Highlight relevant text in an article.",
+    "permissions": ["activeTab", "scripting"],
+    "host_permissions": ["<all_urls>"],
+    "content_scripts": [
+      {
+        "matches": ["<all_urls>"],
+        "js": ["dist/content.bundle.js"]
+      }
+    ]
+  }
+  
