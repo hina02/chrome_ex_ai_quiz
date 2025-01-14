@@ -3,13 +3,19 @@
     "name": "Orama Highlight Extension",
     "version": "1.0",
     "description": "Highlight relevant text in an article.",
-    "permissions": ["activeTab", "scripting"],
+    "permissions": ["activeTab", "scripting", "sidePanel"],
     "host_permissions": ["<all_urls>"],
     "content_scripts": [
       {
         "matches": ["<all_urls>"],
         "js": ["dist/content.bundle.js"]
       }
-    ]
+    ],
+    "side_panel": {
+      "default_path": "sidepanel/index.html"
+    },
+    "background": {
+      "service_worker": "backgdound.js"
+    }
   }
   
