@@ -89,12 +89,12 @@ async function queryDB(query) {
   const results = search(db, {
     mode: "hybrid",
     term: query,
-    threshold: 0.5,
     vector: {
       value: embedding,
       property: "embedding",
     },
-    includeVectors: false,
+    similarity: 0.8,
+    includeVectors: true,
   });
   console.log("検索結果:", results.hits);
   highlightResult(results.hits);
