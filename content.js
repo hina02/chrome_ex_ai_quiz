@@ -1,10 +1,6 @@
-import {
-  create,
-  insertMultiple,
-  search,
-} from "./node_modules/@orama/orama/dist/browser/index.js";
-import { GoogleGenerativeAI } from "./node_modules/@google/generative-ai/dist/index.mjs";
-// import { pluginQPS } from "./node_modules/@orama/plugin-qps/dist/index.js";
+import { create, insertMultiple, search } from "@orama/orama";
+import { GoogleGenerativeAI } from "@google/generative-ai";
+import { pluginQPS } from "@orama/plugin-qps";
 
 const genAI = new GoogleGenerativeAI("AIzaSyD0jBc_JrWx0p5rbM2jBWbAZH_b7_JDIAU");
 const model = genAI.getGenerativeModel({ model: "text-embedding-004" });
@@ -30,12 +26,11 @@ const db = create({
     textContent: "string",
     embedding: "vector[768]",
   },
-  // plugins: [
-  //   pluginQPS(),
-  // ],
+  plugins: [
+    pluginQPS(),
+  ],
 });
 
-const article = document.querySelector("article");
 
 function separateChildren(article) {
   const docs = [];
@@ -43,24 +38,24 @@ function separateChildren(article) {
   for (let i = 0; i < children.length; i++) {
     const textContent = children[i].textContent || "";
 
-    if (textContent && textContent.length > 4000) {
-      const grandChildren = Array.from(children[i].children).filter((
-        grandChild,
-      ) => grandChild.textContent.trim() !== "");
+    if (textContent && textContent.length > 2000) {
+      const grandChildren = Array.from(children[i].children);
       for (let j = 0; j < grandChildren.length; j++) {
         const grandChild = grandChildren[j];
+        const className = grandChild.className || "";
+        const parentClass = grandChild.parentElement?.className || "";
+        if (grandChild.textContent.trim() == "") { continue }
         docs.push({
-          className: grandChild.className.trim().split(/\s+/).join("."),
-          parentClass: grandChild.parentElement?.className.trim().split(/\s+/)
-            .join("."),
+          className: className.trim().split(/\s+/).join("."),
+          parentClass: parentClass.trim().split(/\s+/).join("."),
           index: j,
-          textContent: grandChild.textContent || "",
+          textContent: grandChild.textContent.trim(),
           embedding: [],
         });
       }
-    } else {
+    } else if (textContent.trim() != "") {
       docs.push({
-        className: children[i].className.trim().split(/\s+/).join("."),
+        className: (children[i].className || "").trim().split(/\s+/).join("."),
         parentClass: "article",
         index: i,
         textContent: textContent,
@@ -93,12 +88,13 @@ async function queryDB(query) {
       value: embedding,
       property: "embedding",
     },
-    similarity: 0.8,
+    similarity: 0.4,
     includeVectors: true,
   });
-  console.log("検索結果:", results.hits);
-  highlightResult(results.hits);
-  return results.hits.length;
+  const filteredResults = results.hits.filter((result) => result.score > 0.3);
+  console.log(filteredResults);
+  highlightResult(filteredResults);
+  return filteredResults.length;
 }
 
 function highlightResult(results) {
@@ -116,10 +112,9 @@ function highlightResult(results) {
         targetElement = document.querySelector(`.${className}`);
       } else {
         const parentClass = result.document.parentClass;
-        const index = result.document.index;
-        const parentElement = article.querySelector(`.${parentClass}`);
+        const parentElement = document.querySelector(`.${parentClass}`);
         if (parentElement) {
-          targetElement = parentElement.children[index];
+          targetElement = parentElement.children[result.document.index];
         } else {
           console.error(`親要素が見つかりません: .${parentClass}`);
         }
@@ -143,7 +138,9 @@ function highlightResult(results) {
         //   listItem.appendChild(link);
         // }
       } else {
-        console.log("指定されたインデックスの要素が見つかりません");
+        console.log(
+          `指定されたインデックスの要素が見つかりません: .${className}: ${result.document.index}`,
+        );
       }
     }
     // linksContainer.appendChild(listItem);

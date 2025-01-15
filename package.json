@@ -1,16 +1,15 @@
 {
   "name": "Orama Highlight",
   "version": "1.0",
+  "type": "module",
   "scripts": {
-    "build:content": "rollup content.js --file dist/content.bundle.js --format iife",
-    "build:sidepanel": "rollup sidepanel/index.js --file dist/sidepanel.bundle.js --format iife",
-    "build": "npm run build:content && npm run build:sidepanel"
+    "build": "rollup --config rollup.config.js"
   },
   "private": true,
   "devDependencies": {
     "@google/generative-ai": "0.15.0",
-    "@orama/orama": "^3.0.4",
     "@orama/plugin-qps": "^3.0.4",
-    "rollup": "^4.22.4"
+    "@rollup/plugin-node-resolve": "^16.0.0",
+    "rollup": "^4.30.1"
   }
 }
