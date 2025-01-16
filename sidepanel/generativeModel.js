@@ -4,10 +4,16 @@ import {
   HarmCategory,
 } from "../node_modules/@google/generative-ai/dist/index.mjs";
 
-const apiKey = "AIzaSyD0jBc_JrWx0p5rbM2jBWbAZH_b7_JDIAU";
 
 // モデル生成
-export function createModel(generationConfig) {
+export async function createModel(generationConfig) {
+  // const apiKey = await getApiKeyFromStorage();
+  const apiKey = "AIzaSyBMqhyjCn7kWKb3ZRr9tEeVhMFh78ZzeQY";
+
+  if (!apiKey) {
+    throw new Error("API Key is not available in storage.");
+  }
+
   const safetySettings = [
     {
       category: HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT,
@@ -24,8 +30,9 @@ export function createModel(generationConfig) {
 }
 
 // モデル実行
-export async function runPrompt(model, prompt) {
+export async function runPrompt(generationConfig, prompt) {
   try {
+    const model = await createModel(generationConfig);
     const result = await model.generateContent(prompt);
     const response = await result.response;
     return response.text();

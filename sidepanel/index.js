@@ -1,7 +1,8 @@
-import { createModel, runPrompt } from "./generativeModel.js";
+import { runPrompt } from "./generativeModel.js";
 import {
   buttonPrompt,
   buttonQuery,
+  buttonSettings,
   inputPrompt,
   inputQuery,
   labelTemperature,
@@ -13,17 +14,11 @@ import {
 
 // グローバル設定
 let generationConfig = { temperature: 1 };
-let model = null;
 
 // DOMが読み込まれたら初期化
 document.addEventListener("DOMContentLoaded", () => {
-  init();
   setupEventListeners();
 });
-
-function init() {
-  model = createModel(generationConfig);
-}
 
 function setupEventListeners() {
   // Temperatureスライダー
@@ -46,11 +41,16 @@ function setupEventListeners() {
     const prompt = inputPrompt.value.trim();
     showLoading();
     try {
-      const response = await runPrompt(model, prompt);
+      const response = await runPrompt(generationConfig, prompt);
       showResponse(response);
     } catch (error) {
       showError(error);
     }
+  });
+
+  // Settingsボタン
+  buttonSettings.addEventListener("click", () => {
+    chrome.runtime.openOptionsPage();
   });
 
   // 他拡張機能のメッセージ受信

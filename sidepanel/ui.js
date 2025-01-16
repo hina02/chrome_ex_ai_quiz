@@ -8,6 +8,7 @@ const elementLoading = document.querySelector("#loading");
 const elementError = document.querySelector("#error");
 const sliderTemperature = document.querySelector("#temperature");
 const labelTemperature = document.querySelector("#label-temperature");
+const buttonSettings = document.querySelector("#button-settings");
 
 // UI制御用の関数
 function show(element) {
@@ -50,6 +51,7 @@ export function showError(error) {
 export {
   buttonPrompt,
   buttonQuery,
+  buttonSettings,
   inputPrompt,
   inputQuery,
   labelTemperature,

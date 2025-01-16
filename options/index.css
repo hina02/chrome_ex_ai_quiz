@@ -49,27 +49,24 @@ button[disabled] {
   background: #ddd;
   color: #aaa;
 }
-.header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 4px;
-}
-
-.settings-button {
-  background: none;
-  border: none;
-  color:#1f1f1f;
-  cursor: pointer;
-  font-size: 12px;
-  padding: 0;
-}
 
 input[type="range"] {
   margin-top: 16px;
   accent-color: black;
 }
-
+.password-container {
+  display: flex;
+  align-items: center;
+  gap: 5px; /* 入力フィールドとアイコンの間隔 */
+}
+.icon-button {
+  background: none;
+  border: none;
+  color:#1f1f1f;
+  cursor: pointer;
+  padding: 0;
+  font-size: 24px;
+}
 textarea {
   --padding: 32px;
   width: calc(100% - var(--padding));

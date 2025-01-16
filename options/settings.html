@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0&icon_names=visibility" />
+    <link rel="stylesheet" href="index.css">
+  </head>
+  <body>
+    <h1>Settings</h1>
+    <div>
+      <label for="api-key">API Key:</label>
+      <div class="password-container">
+        <input type="password" id="api-key" placeholder="Enter your API Key" />
+        <button id="toggle-visibility" class="icon-button">
+          <span class="material-symbols-outlined">
+            visibility
+            </span>
+        </button>
+      </div>
+    </div>
+    <button id="save-button" class="primary">Save</button>
+    <button id="close-button" class="secondary">Close</button>
+    <div id="status" class="text" hidden></div>
+    <script src="settings.js"></script>
+  </body>
+</html>
