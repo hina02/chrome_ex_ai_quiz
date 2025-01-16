@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0"
+    />
+    <link rel="stylesheet" href="../index.css">
+  </head>
+  <body>
+    <h1>Settings</h1>
+    <div>
+      <label for="api-key">API Key:</label>
+      <div class="password-container">
+        <input type="password" id="api-key" placeholder="Enter your API Key" />
+        <button id="toggle-visibility" class="icon-button">
+          <span id="text-visibility" class="material-symbols-outlined">
+            visibility
+          </span>
+        </button>
+      </div>
+    </div>
+    <div>
+      <label for="temperature">Temperature: <span id="label-temperature"
+        >1</span></label>
+      <div>
+        <input
+          type="range"
+          id="temperature"
+          name="temperature"
+          min="0"
+          max="1"
+          step="0.1"
+          value="1"
+        />
+      </div>
+    </div>
+    <button id="save-button" class="primary">Save</button>
+    <button id="close-button" class="secondary">Close</button>
+    <div id="status" class="text" hidden></div>
+    <script src="settings.js"></script>
+  </body>
+</html>
