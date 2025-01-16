@@ -6,8 +6,6 @@ const buttonPrompt = document.querySelector("#button-prompt");
 const elementResponse = document.querySelector("#response");
 const elementLoading = document.querySelector("#loading");
 const elementError = document.querySelector("#error");
-const sliderTemperature = document.querySelector("#temperature");
-const labelTemperature = document.querySelector("#label-temperature");
 const buttonSettings = document.querySelector("#button-settings");
 
 // UI制御用の関数
@@ -55,5 +53,4 @@ export {
   inputPrompt,
   inputQuery,
   labelTemperature,
-  sliderTemperature,
 };

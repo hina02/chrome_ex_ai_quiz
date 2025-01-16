@@ -49,11 +49,27 @@ button[disabled] {
   background: #ddd;
   color: #aaa;
 }
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 4px;
+}
+
+.settings-button {
+  background: none;
+  border: none;
+  color: #1f1f1f;
+  cursor: pointer;
+  font-size: 12px;
+  padding: 0;
+}
 
 input[type="range"] {
   margin-top: 16px;
   accent-color: black;
 }
+
 .password-container {
   display: flex;
   align-items: center;
@@ -62,11 +78,12 @@ input[type="range"] {
 .icon-button {
   background: none;
   border: none;
-  color:#1f1f1f;
+  color: #1f1f1f;
   cursor: pointer;
   padding: 0;
   font-size: 24px;
 }
+
 textarea {
   --padding: 32px;
   width: calc(100% - var(--padding));
@@ -86,6 +103,17 @@ textarea {
 
 .blink {
   animation: 1s ease-in-out 1s infinite reverse both running blink;
+}
+
+#error {
+  background-color: #ffebee;
+  color: #c62828;
+  padding: 16px;
+  border-radius: 16px;
+  box-shadow:
+    rgba(0, 0, 0, 0.16) 0px 1px 4px,
+    rgba(198, 40, 40, 0.8) 0px 0px 0px 3px;
+  font-size: 16px;
 }
 
 @keyframes blink {

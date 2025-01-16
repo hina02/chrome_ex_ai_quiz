@@ -1,37 +1,110 @@
 import { create, insertMultiple, search } from "@orama/orama";
-import { GoogleGenerativeAI } from "@google/generative-ai";
+import {
+  GoogleGenerativeAI,
+  HarmBlockThreshold,
+  HarmCategory,
+} from "@google/generative-ai";
 import { pluginQPS } from "@orama/plugin-qps";
 
-const genAI = new GoogleGenerativeAI("AIzaSyD0jBc_JrWx0p5rbM2jBWbAZH_b7_JDIAU");
-const model = genAI.getGenerativeModel({ model: "text-embedding-004" });
+let db = null;
+let embeddingModel = null;
+let genAIModel = null;
 
-async function getEmbedding(text) {
-  const result = await model.embedContent(text);
-  return result.embedding.values;
+// ページ読込時にDBとモデルを初期化
+(async function () {
+  await initDBandModel();
+  const url = window.location.href;
+  const pageData = await getPageElements(url);
+  if (pageData && pageData.length > 0) {
+    console.log(`${url}のページデータをキャッシュから読み込みました。`);
+    return;
+  }
+
+  const article = document.querySelector("article");
+  if (article) {
+    const docs = separateChildren(article);
+    await createDB(docs).then((result) => {
+      if (result) {
+        console.log("ページがデータベースに読み込まれました。");
+        chrome.storage.session.set({ [url]: docs });
+        chrome.runtime.sendMessage({
+          type: "workerShowResponse",
+          payload: "ページがデータベースに読み込まれました。",
+        });
+      }
+    });
+  }
+})();
+
+async function initDBandModel() {
+  // 1. Orama DB 初期化
+  db = create({
+    schema: {
+      className: "string",
+      parentClass: "string",
+      index: "number",
+      textContent: "string",
+      embedding: "vector[768]",
+    },
+    plugins: [pluginQPS()],
+  });
+
+  // 2. embeddingModel 初期化
+  const apiKey = await getApiKeyFromStorage();
+  if (!apiKey) {
+    console.warn("No API Key found. Please set it in options.");
+    chrome.runtime.sendMessage({
+      type: "workerShowError",
+      payload: "設定画面でAPI Keyを設定してください。",
+    });
+    return;
+  }
+  const genAI = new GoogleGenerativeAI(apiKey);
+  embeddingModel = genAI.getGenerativeModel({ model: "text-embedding-004" });
+
+  // 3. GenerativeAIModel 初期化
+  const generationConfig = await getGenerationConfig();
+  const safetySettings = [
+    {
+      category: HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT,
+      threshold: HarmBlockThreshold.BLOCK_NONE,
+    },
+  ];
+  genAIModel = genAI.getGenerativeModel({
+    model: "gemini-1.5-flash",
+    safetySettings,
+    generationConfig,
+  });
 }
-function textToRequest(text) {
-  return { content: { role: "user", parts: [{ text }] } };
+
+
+// chrome.storage
+function getApiKeyFromStorage() {
+  return new Promise((resolve) => {
+    chrome.storage.local.get("apiKey", (data) => {
+      resolve(data.apiKey || null);
+    });
+  });
 }
-async function getEmbeddings(texts) {
-  const requests = texts.map((text) => textToRequest(text));
-  const result = await model.batchEmbedContents({ requests });
-  return result.embeddings.map((embedding) => embedding.values);
+
+function getGenerationConfig() {
+  return new Promise((resolve) => {
+    chrome.storage.local.get("generationConfig", (data) => {
+      resolve(data.generationConfig || null);
+    });
+  });
 }
 
-const db = create({
-  schema: {
-    className: "string",
-    parentClass: "string",
-    index: "number",
-    textContent: "string",
-    embedding: "vector[768]",
-  },
-  plugins: [
-    pluginQPS(),
-  ],
-});
+function getPageElements(url) {
+  return new Promise((resolve) => {
+    chrome.storage.session.get(url, (data) => {
+      resolve(data?.[url] || null);
+    });
+  });
+}
 
 
+// ページ解析
 function separateChildren(article) {
   const docs = [];
   const children = Array.from(article.children);
@@ -44,7 +117,7 @@ function separateChildren(article) {
         const grandChild = grandChildren[j];
         const className = grandChild.className || "";
         const parentClass = grandChild.parentElement?.className || "";
-        if (grandChild.textContent.trim() == "") { continue }
+        if (grandChild.textContent.trim() == "") continue;
         docs.push({
           className: className.trim().split(/\s+/).join("."),
           parentClass: parentClass.trim().split(/\s+/).join("."),
@@ -67,6 +140,15 @@ function separateChildren(article) {
 }
 
 async function createDB(docs) {
+  if (!embeddingModel) {
+    console.warn("No API Key found. Please set it in options.");
+    chrome.runtime.sendMessage({
+      type: "workerShowError",
+      payload: "設定画面でAPI Keyを設定してください。",
+    });
+    return false;
+  }
+
   const batchSize = 100;
   for (let i = 0; i < docs.length; i += batchSize) {
     const batch = docs.slice(i, i + batchSize);
@@ -76,10 +158,32 @@ async function createDB(docs) {
     });
     insertMultiple(db, batch);
   }
+  return true;
+}
+
+async function getEmbedding(text) {
+  const result = await embeddingModel.embedContent(text);
+  return result.embedding.values;
+}
+
+async function getEmbeddings(texts) {
+  const requests = texts.map((text) => ({
+    content: { role: "user", parts: [{ text }] },
+  }));
+  const result = await embeddingModel.batchEmbedContents({ requests });
+  return result.embeddings.map((embedding) => embedding.values);
 }
 
 // query
 async function queryDB(query) {
+  if (!embeddingModel) {
+    console.warn("No API Key found. Please set it in options.");
+    chrome.runtime.sendMessage({
+      type: "workerShowError",
+      payload: "設定画面でAPI Keyを設定してください。",
+    });
+    return;
+  }
   const embedding = await getEmbedding(query);
   const results = search(db, {
     mode: "hybrid",
@@ -90,6 +194,7 @@ async function queryDB(query) {
     },
     similarity: 0.4,
     includeVectors: true,
+    limit: 5,
   });
   const filteredResults = results.hits.filter((result) => result.score > 0.3);
   console.log(filteredResults);
@@ -148,24 +253,37 @@ function highlightResult(results) {
   }
 }
 
-(async function () {
-  const article = document.querySelector("article");
-  if (article) {
-    const docs = separateChildren(article);
-    await createDB(docs);
-    console.log("ページがデータベースに読み込まれました。");
-    chrome.runtime.sendMessage({
-      type: "showResponse",
-      payload: "ページがデータベースに読み込まれました。",
-    });
-  }
-})();
-
+// (sidepanel -> background -> content) => (content -> background -> sidepanel)
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   if (message.action === "queryOrama" && message.text) {
     queryDB(message.text).then((hits) => {
+      console.log(hits);
       sendResponse({ hits });
+    }).catch((error) => {
+      sendResponse({ error });
     });
     return true;
   }
 });
+
+chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
+  if (message.action === "runPrompt" && message.text) {
+    runPrompt(message.text).then((response) => {
+      sendResponse({ response });
+    }).catch((error) => {
+      sendResponse({ error });
+    });
+    return true;
+  }
+});
+
+async function runPrompt(prompt) {
+  try {
+    const result = await genAIModel.generateContent(prompt);
+    const response = await result.response;
+    return response.text();
+  } catch (error) {
+    console.error("Prompt failed:", error);
+    throw error;
+  }
+}

@@ -1,8 +1,11 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <link rel="stylesheet" type="text/css" href="index.css" />
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0&icon_names=settings" />
+    <link rel="stylesheet" type="text/css" href="../index.css" />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0&icon_names=settings"
+    />
   </head>
   <body>
     <div class="header">
@@ -17,7 +20,8 @@
       cols="30"
       rows="1"
     ></textarea>
-    <button id="button-query" class="primary">Query</button>
+    <button id="button-query" class="primary">Search</button>
+    <button id="button-clear" class="primary">Clear</button>
 
     <textarea
       id="input-prompt"
@@ -25,23 +29,10 @@
       cols="30"
       rows="5"
     ></textarea>
-    <div>
-      <input
-        type="range"
-        id="temperature"
-        name="temperature"
-        min="0"
-        max="2"
-        step="0.01"
-        value="1"
-      />
-      <label for="temperature">Temperature: <span id="label-temperature"
-        >1</span></label>
-    </div>
-    <button id="button-prompt" class="primary">Run</button>
+    <button id="button-prompt" class="primary">Ask</button>
     <div id="response" class="text" hidden></div>
     <div id="loading" class="text" hidden><span class="blink">...</span></div>
-    <div id="error" class="text" hidden></div>
+    <div id="error" hidden></div>
     <script src="../dist/sidepanel.bundle.js" type="module"></script>
   </body>
 </html>
