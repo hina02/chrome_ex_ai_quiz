@@ -75,7 +75,7 @@ async function queryDB(query, similarity = 0.7, limit = 3) {
   // active Tabの結果のみを取得
   const filteredResults = results.hits.filter((result) =>
     result.score > 0.3 && result.document.url === window.location.href
-);
+  );
 
   // 結果が0の場合は、active Tabのテキストをデータベースに追加
   if (filteredResults.length === 0) {

@@ -1,3 +1,5 @@
+import { gemini2apiRequest } from "./api.js";
+
 let currentTabId = null;
 
 chrome.sidePanel
@@ -53,7 +55,7 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
       if (tabs[0]?.id) {
         chrome.tabs.sendMessage(
           tabs[0].id,
-          { action: "runPrompt", text },
+          { action: message.action, text },
           (response) => {
             if (chrome.runtime.lastError) {
               showError(
@@ -74,4 +76,48 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     });
   }
   return true;
+});
+
+// (background <=> content)
+
+// (sidepanel <=> background)
+chrome.runtime.onMessage.addListener(async (message, sender, sendResponse) => {
+  if (message.action === "runAnalysis") {
+    try {
+      // activeTabのarticle textContentを取得
+      const tabs = await chrome.tabs.query({
+        active: true,
+        currentWindow: true,
+      });
+      const activeTab = tabs[0];
+
+      const response = await new Promise((resolve, reject) => {
+        chrome.tabs.sendMessage(
+          activeTab.id,
+          { action: "getArticleText" },
+          (response) => {
+            if (chrome.runtime.lastError) {
+              reject(new Error(chrome.runtime.lastError.message));
+            } else {
+              resolve(response);
+            }
+          },
+        );
+      });
+
+      const apiResponse = await gemini2apiRequest(response.text);
+
+      if (apiResponse.error) {
+        console.log("エラーが発生しました。", apiResponse.error);
+        showError(apiResponse.error);
+      } else {
+        console.log("レスポンスを受信しました。", apiResponse);
+        // object[]  object{comment, sentence, stamp}
+        showResponse(apiResponse);
+      }
+    } catch (error) {
+      console.error("エラー:", error.message);
+      sendResponse({ error: error.message });
+    }
+  }
 });

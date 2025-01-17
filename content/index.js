@@ -1,5 +1,5 @@
-import { highlightResult, separateChildren } from "./element";
-import { createDB, initOrama, queryDB } from "./orama";
+import { separateChildren } from "./element";
+import { createDB, initOrama } from "./orama";
 import { initGoogleClient, initModel, runPrompt } from "./generativeAI";
 
 // ページ読込時にDBとモデルを初期化
@@ -44,4 +44,13 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     });
     return true;
   }
+});
+
+// (background <=> content)
+chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
+  if (message.action === "getArticleText") {
+    const articleText = document.querySelector("article")?.textContent || "";
+    sendResponse({ text: articleText });
+  }
+  return true;
 });

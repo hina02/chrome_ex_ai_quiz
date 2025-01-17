@@ -1,4 +1,5 @@
 import {
+  buttonAnalysis,
   buttonPrompt,
   buttonSettings,
   inputPrompt,
@@ -23,6 +24,14 @@ function setupEventListeners() {
     showLoading();
     const response = await new Promise((resolve, reject) => {
       chrome.runtime.sendMessage({ action: "runPrompt", text: prompt });
+    });
+  });
+
+  // Analysisボタン
+  buttonAnalysis.addEventListener("click", async () => {
+    showLoading();
+    const response = await new Promise((resolve, reject) => {
+      chrome.runtime.sendMessage({ action: "runAnalysis" });
     });
   });
 
