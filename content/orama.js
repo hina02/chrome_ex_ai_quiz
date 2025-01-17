@@ -50,7 +50,7 @@ async function createDB(docs) {
 }
 
 // query
-async function queryDB(query) {
+async function queryDB(query, similarity = 0.4, limit = 5) {
   const embedding = await getEmbedding(query);
   const results = search(db, {
     mode: "hybrid",
@@ -59,9 +59,9 @@ async function queryDB(query) {
       value: embedding,
       property: "embedding",
     },
-    similarity: 0.4,
+    similarity: similarity,
     includeVectors: false,
-    limit: 5,
+    limit: limit,
   });
   const filteredResults = results.hits.filter((result) => result.score > 0.3);
   console.log(filteredResults);

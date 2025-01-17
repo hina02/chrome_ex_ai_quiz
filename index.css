@@ -116,6 +116,11 @@ textarea {
   font-size: 16px;
 }
 
+.activeTabTitle {
+  font-weight: bold;
+  margin-bottom: 5px;
+}
+
 @keyframes blink {
   25% {
     opacity: 0.5;

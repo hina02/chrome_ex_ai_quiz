@@ -51,6 +51,13 @@ function setupEventListeners() {
         showError(message.payload);
         break;
 
+      case "activeTab":
+        if (message.title) {
+          document.getElementById("activeTabDisplay").textContent =
+            message.title;
+        }
+        break;
+
       default:
         console.warn("不明なメッセージタイプ:", message.type);
         break;

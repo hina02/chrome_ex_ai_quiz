@@ -15,12 +15,5 @@ function getGenerationConfig() {
   });
 }
 
-function getPageElements(url) {
-  return new Promise((resolve) => {
-    chrome.storage.session.get(url, (data) => {
-      resolve(data?.[url] || null);
-    });
-  });
-}
 
-export { getApiKeyFromStorage, getGenerationConfig, getPageElements };
+export { getApiKeyFromStorage, getGenerationConfig };

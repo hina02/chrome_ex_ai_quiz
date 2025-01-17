@@ -2,6 +2,7 @@ import { HarmBlockThreshold, HarmCategory } from "@google/generative-ai";
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import { getApiKeyFromStorage, getGenerationConfig } from "./storage";
 import { queryDB } from "./orama";
+import { highlightResult } from "./element";
 
 let genAIModel = null;
 
@@ -18,6 +19,7 @@ async function initGoogleClient() {
 
   try {
     const genAI = new GoogleGenerativeAI(apiKey);
+
     genAIModel = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
     await genAIModel.generateContent("Hello, World!");
     console.log("api key is valid");
@@ -44,31 +46,29 @@ async function initModel(googleClient) {
     model: "gemini-1.5-flash",
     safetySettings,
     generationConfig,
+    systemInstruction: `あなたはChrome拡張機能の一部として動作するAIです。
+アクティブなタブのウェブページ情報にアクセスできます。
+ユーザーの質問には、この情報を基に『端的に』回答してください。`,
   });
+  return genAIModel;
 }
 
 async function runPrompt(prompt) {
   try {
-    const result = await genAIModel.generateContent(prompt);
-    const response = await result.response;
-    return response.text();
+    const articleText = document.querySelector("article").textContent;
+    const result = await genAIModel.generateContent(
+      "質問: " + prompt + "\n\nウェブページ情報: " + articleText,
+    );
+
+    // 生成結果から該当箇所を検索する。
+    const results = await queryDB(result.response.text(), 0.45, 3);
+    highlightResult(results);
+
+    return result.response.text();
   } catch (error) {
     console.error("Prompt failed:", error);
     throw error;
   }
 }
-
-const queryDBTool = {
-    name: "queryDatabase",
-    parameters: {
-        type: "string",
-        description: "Query the database for search active tab elements",
-    }
-};
-
-async function queryDBFunction(query) {
-    return await queryDB(query);
-}
-
 
 export { initGoogleClient, initModel, runPrompt };

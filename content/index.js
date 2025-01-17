@@ -1,5 +1,4 @@
-import { getPageElements } from "./storage";
-import { separateChildren, highlightResult } from "./element";
+import { highlightResult, separateChildren } from "./element";
 import { createDB, initOrama, queryDB } from "./orama";
 import { initGoogleClient, initModel, runPrompt } from "./generativeAI";
 
@@ -16,13 +15,6 @@ import { initGoogleClient, initModel, runPrompt } from "./generativeAI";
   await initModel(googleClient);
 
   // 3. ページデータ読み込み
-  const url = window.location.href;
-  const pageData = await getPageElements(url);
-  if (pageData && pageData.length > 0) {
-    console.log(`${url}のページデータをキャッシュから読み込みました。`);
-    return;
-  }
-
   const article = document.querySelector("article");
   if (article) {
     const docs = separateChildren(article);
@@ -31,7 +23,6 @@ import { initGoogleClient, initModel, runPrompt } from "./generativeAI";
     await createDB(docs).then((result) => {
       if (result) {
         console.log("ページがデータベースに読み込まれました。");
-        chrome.storage.session.set({ [url]: docs });
         chrome.runtime.sendMessage({
           type: "workerShowResponse",
           payload: "ページがデータベースに読み込まれました。",
