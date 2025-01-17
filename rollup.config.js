@@ -2,7 +2,7 @@ import { nodeResolve } from "@rollup/plugin-node-resolve";
 
 export default [
   {
-    input: "content.js",
+    input: "content/index.js",
     output: {
       file: "dist/content.bundle.js",
       format: "iife",

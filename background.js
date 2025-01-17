@@ -1,6 +1,6 @@
 chrome.sidePanel
   .setPanelBehavior({ openPanelOnActionClick: true })
-  .catch((error) => (error));
+  .catch((error) => error);
 
 const showError = (payload) => {
   chrome.runtime.sendMessage({ type: "showError", payload });
@@ -34,7 +34,9 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
           { action: "queryOrama", text },
           (response) => {
             if (chrome.runtime.lastError) {
-              showError("コンテンツスクリプトとの通信に失敗しました。APIキーの設定を確認し、ページをリロードしてください。");
+              showError(
+                "コンテンツスクリプトとの通信に失敗しました。APIキーの設定を確認し、ページをリロードしてください。",
+              );
             } else if (response?.error) {
               showError(response.error);
             } else if (response?.hits !== undefined) {
@@ -63,7 +65,9 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
           { action: "runPrompt", text },
           (response) => {
             if (chrome.runtime.lastError) {
-              showError("コンテンツスクリプトとの通信に失敗しました。APIキーの設定を確認し、ページをリロードしてください。");
+              showError(
+                "コンテンツスクリプトとの通信に失敗しました。APIキーの設定を確認し、ページをリロードしてください。",
+              );
             } else if (response?.error) {
               showError(response.error);
             } else if (response?.response !== undefined) {

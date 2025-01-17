@@ -42,18 +42,18 @@ function setupEventListeners() {
 
   // 他拡張機能のメッセージ受信
   chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
-      switch (message.type) {
-        case "showResponse":
-          showResponse(message.payload);
-          break;
+    switch (message.type) {
+      case "showResponse":
+        showResponse(message.payload);
+        break;
 
-        case "showError":
-          showError(message.payload);
-          break;
+      case "showError":
+        showError(message.payload);
+        break;
 
-        default:
-          console.warn("不明なメッセージタイプ:", message.type);
-          break;
-      }
+      default:
+        console.warn("不明なメッセージタイプ:", message.type);
+        break;
+    }
   });
 }
