@@ -1,5 +1,5 @@
 import { getPageElements } from "./storage";
-import { separateChildren } from "./element";
+import { separateChildren, highlightResult } from "./element";
 import { createDB, initOrama, queryDB } from "./orama";
 import { initGoogleClient, initModel, runPrompt } from "./generativeAI";
 
@@ -44,11 +44,9 @@ import { initGoogleClient, initModel, runPrompt } from "./generativeAI";
 // (sidepanel -> background -> content) => (content -> background -> sidepanel)
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   if (message.action === "queryOrama" && message.text) {
-    queryDB(message.text).then((hits) => {
-      console.log(hits);
-      sendResponse({ hits });
-    }).catch((error) => {
-      sendResponse({ error });
+    queryDB(message.text).then((results) => {
+      highlightResult(results);
+      sendResponse(results);
     });
     return true;
   }

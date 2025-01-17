@@ -37,15 +37,6 @@ async function getEmbeddings(texts) {
 }
 
 async function createDB(docs) {
-  if (!embeddingModel) {
-    console.warn("No API Key found. Please set it in options.");
-    chrome.runtime.sendMessage({
-      type: "workerShowError",
-      payload: "設定画面でAPI Keyを設定してください。",
-    });
-    return false;
-  }
-
   const batchSize = 100;
   for (let i = 0; i < docs.length; i += batchSize) {
     const batch = docs.slice(i, i + batchSize);
@@ -60,14 +51,6 @@ async function createDB(docs) {
 
 // query
 async function queryDB(query) {
-  if (!embeddingModel) {
-    console.warn("No API Key found. Please set it in options.");
-    chrome.runtime.sendMessage({
-      type: "workerShowError",
-      payload: "設定画面でAPI Keyを設定してください。",
-    });
-    return;
-  }
   const embedding = await getEmbedding(query);
   const results = search(db, {
     mode: "hybrid",
@@ -77,13 +60,12 @@ async function queryDB(query) {
       property: "embedding",
     },
     similarity: 0.4,
-    includeVectors: true,
+    includeVectors: false,
     limit: 5,
   });
   const filteredResults = results.hits.filter((result) => result.score > 0.3);
   console.log(filteredResults);
-  highlightResult(filteredResults);
-  return filteredResults.length;
+  return filteredResults;
 }
 
 export { createDB, initOrama, queryDB };

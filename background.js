@@ -39,9 +39,9 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
               );
             } else if (response?.error) {
               showError(response.error);
-            } else if (response?.hits !== undefined) {
+            } else  {
               const responseMessage =
-                `「${text}」に関連する箇所が${response.hits}件見つかりました。`;
+                `「${text}」に関連する箇所が${response.length}件見つかりました。`;
               showResponse(responseMessage);
             }
           },

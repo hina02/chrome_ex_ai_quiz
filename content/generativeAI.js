@@ -1,6 +1,7 @@
 import { HarmBlockThreshold, HarmCategory } from "@google/generative-ai";
-import { getApiKeyFromStorage, getGenerationConfig } from "./storage";
 import { GoogleGenerativeAI } from "@google/generative-ai";
+import { getApiKeyFromStorage, getGenerationConfig } from "./storage";
+import { queryDB } from "./orama";
 
 let genAIModel = null;
 
@@ -56,5 +57,18 @@ async function runPrompt(prompt) {
     throw error;
   }
 }
+
+const queryDBTool = {
+    name: "queryDatabase",
+    parameters: {
+        type: "string",
+        description: "Query the database for search active tab elements",
+    }
+};
+
+async function queryDBFunction(query) {
+    return await queryDB(query);
+}
+
 
 export { initGoogleClient, initModel, runPrompt };
