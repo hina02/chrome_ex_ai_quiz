@@ -14,12 +14,14 @@ import { initGoogleClient, initModel, runPrompt } from "./generativeAI";
   // 2. GenerativeAI 初期化
   await initModel(googleClient);
 
-  // 3. ページデータ読み込み
+  await savePageData();
+})();
+
+async function savePageData() {
   const article = document.querySelector("article");
   if (article) {
     const docs = separateChildren(article);
 
-    // 4. Oramaに保存
     await createDB(docs).then((result) => {
       if (result) {
         console.log("ページがデータベースに読み込まれました。");
@@ -30,19 +32,9 @@ import { initGoogleClient, initModel, runPrompt } from "./generativeAI";
       }
     });
   }
-})();
+}
 
 // (sidepanel -> background -> content) => (content -> background -> sidepanel)
-chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
-  if (message.action === "queryOrama" && message.text) {
-    queryDB(message.text).then((results) => {
-      highlightResult(results);
-      sendResponse(results);
-    });
-    return true;
-  }
-});
-
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   if (message.action === "runPrompt" && message.text) {
     runPrompt(message.text).then((response) => {

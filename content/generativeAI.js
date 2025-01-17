@@ -61,7 +61,7 @@ async function runPrompt(prompt) {
     );
 
     // 生成結果から該当箇所を検索する。
-    const results = await queryDB(result.response.text(), 0.45, 3);
+    const results = await queryDB(result.response.text());
     highlightResult(results);
 
     return result.response.text();

@@ -15,14 +15,6 @@
       </button>
     </div>
     <div class="activeTabTitle" id="activeTabDisplay">Loading...</div>
-    <textarea
-      id="input-query"
-      placeholder="Search query"
-      cols="30"
-      rows="1"
-    ></textarea>
-    <button id="button-query" class="primary">Search</button>
-    <button id="button-clear" class="primary">Clear</button>
 
     <textarea
       id="input-prompt"
@@ -30,7 +22,10 @@
       cols="30"
       rows="5"
     ></textarea>
-    <button id="button-prompt" class="primary">Ask</button>
+    <div>
+      <button id="button-prompt" class="primary">Ask</button>
+      <button id="button-clear" class="primary">Clear</button>
+    </div>
     <div id="response" class="text" hidden></div>
     <div id="loading" class="text" hidden><span class="blink">...</span></div>
     <div id="error" hidden></div>

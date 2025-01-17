@@ -15,5 +15,4 @@ function getGenerationConfig() {
   });
 }
 
-
 export { getApiKeyFromStorage, getGenerationConfig };

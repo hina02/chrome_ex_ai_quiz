@@ -1,6 +1,4 @@
 // UI 要素の取得
-const inputQuery = document.querySelector("#input-query");
-const buttonQuery = document.querySelector("#button-query");
 const inputPrompt = document.querySelector("#input-prompt");
 const buttonPrompt = document.querySelector("#button-prompt");
 const elementResponse = document.querySelector("#response");
@@ -46,11 +44,4 @@ export function showError(error) {
   elementError.textContent = error;
 }
 
-export {
-  buttonPrompt,
-  buttonQuery,
-  buttonSettings,
-  inputPrompt,
-  inputQuery,
-  labelTemperature,
-};
+export { buttonPrompt, buttonSettings, inputPrompt, labelTemperature };

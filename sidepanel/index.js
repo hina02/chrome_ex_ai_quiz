@@ -1,9 +1,7 @@
 import {
   buttonPrompt,
-  buttonQuery,
   buttonSettings,
   inputPrompt,
-  inputQuery,
   showError,
   showLoading,
   showResponse,
@@ -15,13 +13,6 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 
 function setupEventListeners() {
-  // Queryボタン
-  buttonQuery.addEventListener("click", () => {
-    const query = inputQuery.value.trim();
-    showResponse("クエリを送信中...");
-    chrome.runtime.sendMessage({ action: "queryOrama", text: query });
-  });
-
   // Promptボタン
   buttonPrompt.addEventListener("click", async () => {
     const prompt = inputPrompt.value.trim();

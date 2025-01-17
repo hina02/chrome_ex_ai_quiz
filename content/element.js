@@ -5,7 +5,7 @@ function separateChildren(article) {
   for (let i = 0; i < children.length; i++) {
     const textContent = children[i].textContent || "";
 
-    if (textContent && textContent.length > 2000) {
+    if (textContent && textContent.length > 1000) {
       const grandChildren = Array.from(children[i].children);
       for (let j = 0; j < grandChildren.length; j++) {
         const grandChild = grandChildren[j];
@@ -13,6 +13,7 @@ function separateChildren(article) {
         const parentClass = grandChild.parentElement?.className || "";
         if (grandChild.textContent.trim() == "") continue;
         docs.push({
+          url: window.location.href,
           className: className.trim().split(/\s+/).join("."),
           parentClass: parentClass.trim().split(/\s+/).join("."),
           index: j,
@@ -22,6 +23,7 @@ function separateChildren(article) {
       }
     } else if (textContent.trim() != "") {
       docs.push({
+        url: window.location.href,
         className: (children[i].className || "").trim().split(/\s+/).join("."),
         parentClass: "article",
         index: i,
