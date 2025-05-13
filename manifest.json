@@ -3,7 +3,7 @@
   "name": "Orama Highlight Extension",
   "version": "1.0",
   "description": "Highlight relevant text in an article.",
-  "permissions": ["activeTab", "scripting", "sidePanel", "storage"],
+  "permissions": ["activeTab", "scripting", "sidePanel", "storage", "contextMenus"],
   "host_permissions": ["<all_urls>"],
   "content_scripts": [
     {

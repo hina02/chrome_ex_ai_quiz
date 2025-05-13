@@ -26,7 +26,7 @@ function sendUrlToSidePanel(title) {
   chrome.runtime.sendMessage({ type: "activeTab", title: title });
 }
 
-// (content -> background -> sidepanel)
+// 共通メッセージ(content -> background -> sidepanel)
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   if (message.type === "workerShowResponse") {
     showResponse(message.payload);
@@ -46,7 +46,7 @@ const showResponse = (payload) => {
   chrome.runtime.sendMessage({ type: "showResponse", payload });
 };
 
-// (sidepanel -> background -> content) => (content -> background -> sidepanel)
+// runPrompt (sidepanel -> background -> content 往復)
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   if (message.action === "runPrompt") {
     const text = message.text;
@@ -78,9 +78,8 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   return true;
 });
 
-// (background <=> content)
 
-// (sidepanel <=> background)
+// runAnalysis (sidepanel -> background 往復)
 chrome.runtime.onMessage.addListener(async (message, sender, sendResponse) => {
   if (message.action === "runAnalysis") {
     try {
@@ -120,4 +119,44 @@ chrome.runtime.onMessage.addListener(async (message, sender, sendResponse) => {
       sendResponse({ error: error.message });
     }
   }
+});
+
+// runExplain
+chrome.runtime.onInstalled.addListener(() => {
+  chrome.contextMenus.create({
+    id: "runExplain",
+    title: "Explain Selected Text",
+    contexts: ["selection"]
+  });
+});
+
+chrome.contextMenus.onClicked.addListener((info, tab) => {
+  if (info.menuItemId === "runExplain" && info.selectionText) {
+    const selectedText = info.selectionText;
+
+    chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
+      if (tabs[0]?.id) {
+        chrome.tabs.sendMessage(
+          tabs[0].id,
+          { action: "runPrompt", selectedText },
+          (response) => {
+            if (chrome.runtime.lastError) {
+              showError(
+                "コンテンツスクリプトとの通信に失敗しました。APIキーの設定を確認し、ページをリロードしてください。",
+              );
+            } else if (response?.error) {
+              showError(response.error);
+            } else if (response?.response !== undefined) {
+              showResponse(response.response);
+            } else {
+              showError("不明なエラーが発生しました。");
+            }
+          },
+        );
+      } else {
+        showError("タブが見つかりません。");
+      }
+    });
+  }
+  return true;
 });
