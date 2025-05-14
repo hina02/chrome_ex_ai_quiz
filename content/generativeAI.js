@@ -1,8 +1,6 @@
 import { HarmBlockThreshold, HarmCategory } from "@google/generative-ai";
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import { getApiKeyFromStorage, getGenerationConfig } from "./storage";
-import { queryDB } from "./orama";
-import { highlightResult } from "./element";
 
 let genAIModel = null;
 
@@ -59,10 +57,6 @@ async function runPrompt(prompt) {
     const result = await genAIModel.generateContent(
       "質問: " + prompt + "\n\nウェブページ情報: " + articleText,
     );
-
-    // 生成結果から該当箇所を検索する。
-    const results = await queryDB(result.response.text());
-    highlightResult(results);
 
     return result.response.text();
   } catch (error) {
