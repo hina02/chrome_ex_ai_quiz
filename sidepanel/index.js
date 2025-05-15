@@ -30,8 +30,23 @@ function setupEventListeners() {
   // Analysisボタン
   buttonAnalysis.addEventListener("click", async () => {
     showLoading();
-    const response = await new Promise((resolve, reject) => {
-      chrome.runtime.sendMessage({ action: "runAnalysis" });
+    console.log("Analysis button clicked");
+    new Promise((resolve, reject) => {
+      chrome.runtime.sendMessage({ action: "runAnalysis" }, (responseCallback) => {
+        if (chrome.runtime.lastError) {
+          reject(new Error(chrome.runtime.lastError.message));
+        } else {
+          console.log("記事のテキストを取得しました。");
+          resolve(responseCallback);
+        }
+      });
+    })
+    .then((response) => {
+      showResponse(response);
+    })
+    .catch((error) => {
+      console.error("解析エラー:", error);
+      showError(error.message || "不明なエラーが発生しました。");
     });
   });
 
@@ -50,7 +65,8 @@ function setupEventListeners() {
       case "showError":
         showError(message.payload);
         break;
-
+ 
+      // サイドパネルのサブタイトルに、ウェブページのタイトルを表示
       case "activeTab":
         if (message.title) {
           document.getElementById("activeTabDisplay").textContent =
