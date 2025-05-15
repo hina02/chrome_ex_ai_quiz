@@ -7,23 +7,30 @@ chrome.sidePanel
   .catch((error) => error);
 
 // activTab (background -> sidepanel)
-chrome.tabs.onActivated.addListener((activeInfo) => {
-  chrome.tabs.get(activeInfo.tabId, (tab) => {
-    if (tab && tab.title) {
-      currentTabId = activeInfo.tabId;
-      sendUrlToSidePanel(tab.title);
-    }
-  });
-});
-
-chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
-  if (tabId === currentTabId && changeInfo.title) {
-    sendUrlToSidePanel(changeInfo.title);
+chrome.tabs.onActivated.addListener(async (activeInfo) => {
+  const tab = await chrome.tabs.get(activeInfo.tabId);
+  if (tab && tab.title) {
+    currentTabId = activeInfo.tabId;
+    await sendUrlToSidePanel(tab.title);
   }
 });
 
-function sendUrlToSidePanel(title) {
-  chrome.runtime.sendMessage({ type: "activeTab", title: title });
+chrome.tabs.onUpdated.addListener(async (tabId, changeInfo, tab) => {
+  if (tabId === currentTabId && changeInfo.title) {
+    await sendUrlToSidePanel(changeInfo.title);
+  }
+});
+
+async function sendUrlToSidePanel(title) {
+  const contexts = await chrome.runtime.getContexts({
+    contextTypes: ['SIDE_PANEL']
+  });
+
+  if (contexts && contexts.length > 0) {
+    const response = await chrome.runtime.sendMessage({ type: "activeTab", title: title });
+  } else {
+    console.log("サイドパネルがまだ開いていないため、'activeTab'のメッセージは更新されませんでした。");
+  }
 }
 
 // 共通メッセージ(content -> background -> sidepanel)
