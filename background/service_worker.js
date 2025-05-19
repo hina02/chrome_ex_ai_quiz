@@ -1,4 +1,4 @@
-import { gemini2apiRequest } from "./api.js";
+// import { gemini2apiRequest } from "./api.js";
 
 let currentTabId = null;
 
@@ -33,6 +33,7 @@ async function sendUrlToSidePanel(title) {
   }
 }
 
+// TODO 確認
 // 共通メッセージ(content -> background -> sidepanel)
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   if (message.type === "workerShowResponse") {
@@ -57,12 +58,15 @@ const showResponse = (payload) => {
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   if (message.action === "runPrompt") {
     const text = message.text;
+    console.log("runPrompt", text);
 
+    // TODO （article不要なので）コンテンツスクリプトに送らずに、generativeAIに直接リクエスト
+    // TODO ストレージからarticleを取得
     chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
       if (tabs[0]?.id) {
         chrome.tabs.sendMessage(
           tabs[0].id,
-          { action: message.action, text },
+          { action: "runPrompt", text },
           (response) => {
             if (chrome.runtime.lastError) {
               showError(
@@ -101,26 +105,30 @@ chrome.runtime.onMessage.addListener(async (message, sender, sendResponse) => {
         chrome.tabs.sendMessage(
           activeTab.id,
           { action: "getArticleText" },
-          (response) => {
+          (responseCallback) => {
             if (chrome.runtime.lastError) {
+              console.error("getArticleText エラー: セレクタが'article'にマッチしません。或いは、リロードで解決する場合があります。");
               reject(new Error(chrome.runtime.lastError.message));
             } else {
-              resolve(response);
+              console.log("記事のテキストを取得しました。");
+              resolve(responseCallback);
             }
-          },
+          }
         );
       });
 
-      const apiResponse = await gemini2apiRequest(response.text);
+      sendResponse(response.text);
+      // TODO Check
+      // const apiResponse = await gemini2apiRequest(response.text);
 
-      if (apiResponse.error) {
-        console.log("エラーが発生しました。", apiResponse.error);
-        showError(apiResponse.error);
-      } else {
-        console.log("レスポンスを受信しました。", apiResponse);
-        // object[]  object{comment, sentence, stamp}
-        showResponse(apiResponse);
-      }
+      // if (apiResponse.error) {
+      //   console.log("エラーが発生しました。", apiResponse.error);
+      //   showError(apiResponse.error);
+      // } else {
+      //   console.log("レスポンスを受信しました。", apiResponse);
+      //   // object[]  object{comment, sentence, stamp}
+      //   showResponse(apiResponse);
+      // }
     } catch (error) {
       console.error("エラー:", error.message);
       sendResponse({ error: error.message });

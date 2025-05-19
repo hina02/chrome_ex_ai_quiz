@@ -46,6 +46,11 @@ export function showError(error) {
   elementError.textContent = error;
 }
 
+export function clearDisplay() {
+  elementResponse.textContent = "";
+  elementError.textContent = "";
+}
+
 export {
   buttonAnalysis,
   buttonPrompt,

@@ -18,7 +18,7 @@ async function initGoogleClient() {
   try {
     const genAI = new GoogleGenerativeAI(apiKey);
 
-    genAIModel = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+    genAIModel = genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
     await genAIModel.generateContent("Hello, World!");
     console.log("api key is valid");
     return genAI;
@@ -41,23 +41,24 @@ async function initModel(googleClient) {
     },
   ];
   genAIModel = googleClient.getGenerativeModel({
-    model: "gemini-1.5-flash",
+    model: "gemini-2.0-flash",
     safetySettings,
     generationConfig,
-    systemInstruction: `あなたはChrome拡張機能の一部として動作するAIです。
-アクティブなタブのウェブページ情報にアクセスできます。
-ユーザーの質問には、この情報を基に『端的に』回答してください。`,
+    systemInstruction: `あなたはチューターです。
+    与えられたウェブページ情報に基づいて、問題文と回答のセットを作成したり、
+    生徒からの質問に対して説明することが役割づけられています。
+    質問に対しては、不要な話題を広げず、なるべく『端的に』回答してください。`,
   });
   return genAIModel;
 }
 
 async function runPrompt(prompt) {
   try {
-    const articleText = document.querySelector("article").textContent;
+    console.log("リクエスト中...");
     const result = await genAIModel.generateContent(
-      "質問: " + prompt + "\n\nウェブページ情報: " + articleText,
+      "質問: " + prompt,
     );
-
+    console.log("Prompt result:", result);
     return result.response.text();
   } catch (error) {
     console.error("Prompt failed:", error);

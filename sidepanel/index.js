@@ -1,17 +1,29 @@
 import {
   buttonAnalysis,
   buttonPrompt,
+  buttonClear,
   buttonSettings,
   inputPrompt,
   showError,
   showLoading,
   showResponse,
+  clearDisplay,
 } from "./ui.js";
+import { initGoogleClient, initModel, runPrompt } from "./generativeAI";
 
 // DOMが読み込まれたら初期化
 document.addEventListener("DOMContentLoaded", () => {
   setupEventListeners();
 });
+
+(async function () {
+  // Google Client 初期化
+  const googleClient = await initGoogleClient();
+  if (!googleClient) return;
+
+  await initModel(googleClient);
+})();
+
 
 function setupEventListeners() {
   // Promptボタン
@@ -22,8 +34,17 @@ function setupEventListeners() {
       return;
     }
     showLoading();
-    const response = await new Promise((resolve, reject) => {
-      chrome.runtime.sendMessage({ action: "runPrompt", text: prompt });
+    await runPrompt(prompt)
+    .then((response) => {
+      if (response.error) {
+        showError(response.error);
+      } else {
+        showResponse(response);
+      }
+    })
+    .catch((error) => {
+      console.error("プロンプト実行エラー:", error);
+      showError(error.message || "不明なエラーが発生しました。");
     });
   });
 
@@ -48,6 +69,12 @@ function setupEventListeners() {
       console.error("解析エラー:", error);
       showError(error.message || "不明なエラーが発生しました。");
     });
+  });
+
+  // Clearボタン
+  buttonClear.addEventListener("click", () => {
+    inputPrompt.value = "";
+    clearDisplay();
   });
 
   // Settingsボタン
