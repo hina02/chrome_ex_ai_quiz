@@ -34,40 +34,48 @@ function setupEventListeners() {
       return;
     }
     showLoading();
-    await runPrompt(prompt)
-    .then((response) => {
+    try {
+      const response = await runPrompt(prompt);
       if (response.error) {
         showError(response.error);
       } else {
         showResponse(response);
       }
-    })
-    .catch((error) => {
+    } catch (error) {
       console.error("プロンプト実行エラー:", error);
       showError(error.message || "不明なエラーが発生しました。");
-    });
+    }
   });
 
   // Analysisボタン
   buttonAnalysis.addEventListener("click", async () => {
     showLoading();
-    console.log("Analysis button clicked");
-    new Promise((resolve, reject) => {
-      chrome.runtime.sendMessage({ action: "runAnalysis" }, (responseCallback) => {
-        if (chrome.runtime.lastError) {
-          reject(new Error(chrome.runtime.lastError.message));
-        } else {
-          console.log("記事のテキストを取得しました。");
-          resolve(responseCallback);
-        }
+    chrome.tabs.query({ active: true, currentWindow: true }, async (tabs) => {
+      const activeTab = tabs[0];
+      const articleText = await new Promise((resolve, reject) => {
+        chrome.tabs.sendMessage(activeTab.id, { action: "getArticleText" }, (response) => {
+          if (chrome.runtime.lastError) {
+            reject(new Error(chrome.runtime.lastError.message));
+            return;
+          }
+          resolve(response.text);
+        });
       });
-    })
-    .then((response) => {
-      showResponse(response);
-    })
-    .catch((error) => {
-      console.error("解析エラー:", error);
+      
+    // 作成済みのテストを履歴に残しておく
+    try {
+      const prompt = `次のテキストに基づいて、質問文と回答のセットを1セット作成しなさい。 ${articleText}`;
+      console.log("Prompt:", prompt);
+      const response = await runPrompt(prompt);
+      if (response.error) {
+        showError(response.error);
+      } else {
+        showResponse(response);
+      }
+    } catch (error) {
+      console.error("プロンプト実行エラー:", error);
       showError(error.message || "不明なエラーが発生しました。");
+    }
     });
   });
 
