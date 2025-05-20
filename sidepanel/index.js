@@ -9,7 +9,8 @@ import {
   showResponse,
   clearDisplay,
 } from "./ui.js";
-import { initGoogleClient, initModel, runPrompt } from "./generativeAI";
+import { initGoogleClient, runPrompt, runTestMaker } from "./generativeAI";
+import { displayQuiz, quizData } from "./quiz.js";
 
 // DOMが読み込まれたら初期化
 document.addEventListener("DOMContentLoaded", () => {
@@ -20,8 +21,6 @@ document.addEventListener("DOMContentLoaded", () => {
   // Google Client 初期化
   const googleClient = await initGoogleClient();
   if (!googleClient) return;
-
-  await initModel(googleClient);
 })();
 
 
@@ -64,13 +63,19 @@ function setupEventListeners() {
       
     // 作成済みのテストを履歴に残しておく
     try {
-      const prompt = `次のテキストに基づいて、質問文と回答のセットを1セット作成しなさい。 ${articleText}`;
-      console.log("Prompt:", prompt);
-      const response = await runPrompt(prompt);
+      const prompt = articleText;
+      const response = await runTestMaker(prompt);
       if (response.error) {
         showError(response.error);
       } else {
-        showResponse(response);
+        const parsedResponse = JSON.parse(response);
+        // showResponse(response);
+        console.log("response:", parsedResponse);
+        quizData.question = parsedResponse.question;
+        quizData.answer = parsedResponse.answer;
+        quizData.option = parsedResponse.option;
+        quizData.explain = parsedResponse.explain;
+        displayQuiz(quizData);
       }
     } catch (error) {
       console.error("プロンプト実行エラー:", error);

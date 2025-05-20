@@ -7,7 +7,7 @@
   },
   "private": true,
   "devDependencies": {
-    "@google/generative-ai": "0.24.1",
+    "@google/genai": "^1.0.0",
     "@rollup/plugin-node-resolve": "^16.0.0",
     "dotenv": "16.5.0",
     "rollup": "^4.40.2",
