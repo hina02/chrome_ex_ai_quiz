@@ -20,8 +20,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
 (async function () {
   // Google Client 初期化
-  const googleClient = await initGoogleClient();
-  if (!googleClient) return;
+  const result = await initGoogleClient();
+  if (!result) return;
 })();
 
 // ウェブページのテキストを保存

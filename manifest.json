@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "AI 4択クイズ",
-  "version": "1.0",
+  "version": "1.0.1",
   "description": "Webページ上の情報をもとに、AIが問いと回答を作成します。また、AIに質問を投げかけることもできます。",
   "permissions": ["activeTab", "scripting", "sidePanel", "storage", "contextMenus"],
   "host_permissions": ["<all_urls>"],

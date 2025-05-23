@@ -50,7 +50,7 @@ async function initGoogleClient() {
       contents: "Hello, World!",
     })
     console.log("api key is valid");
-    return genAI;
+    return true;
   } catch (error) {
     console.warn("Invalid API Key. Please check your configuration:", error);
     chrome.runtime.sendMessage({
@@ -62,6 +62,14 @@ async function initGoogleClient() {
 }
 
 async function runPrompt(prompt) {
+  if (!genAI) {
+    const result = await initGoogleClient();
+    if (!result) {
+      console.warn("GoogleGenAI client initialization failed.");
+      return null;
+    }
+  }
+
   try {
     const generationConfig = await getGenerationConfig();
     const systemPrompt = await getSystemPrompt();
@@ -91,6 +99,14 @@ async function runPrompt(prompt) {
 }
 
 async function runTestMaker(articleText) {
+  if (!genAI) {
+    const result = await initGoogleClient();
+    if (!result) {
+      console.warn("GoogleGenAI client initialization failed.");
+      return null;
+    }
+  }
+
   try {
     console.log("リクエスト中...");
     const generationConfig = await getGenerationConfig();
