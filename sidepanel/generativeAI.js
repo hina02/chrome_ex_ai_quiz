@@ -1,5 +1,5 @@
 import { HarmBlockThreshold, HarmCategory, GoogleGenAI, Type } from "@google/genai/web";
-import { getApiKeyFromStorage, getGenerationConfig } from "./storage";
+import { getApiKeyFromStorage, getGenerationConfig, getSystemPrompt } from "./storage";
 
 let apiKey = null;
 let genAI = null;
@@ -24,6 +24,8 @@ let responseSchema = {
         },
         propertyOrdering: ["question", "answer", "option", "explain"],
       }
+
+let quizHistory = [];
 
 
 async function initGoogleClient() {
@@ -58,6 +60,7 @@ async function initGoogleClient() {
 async function runPrompt(prompt) {
   try {
     const generationConfig = await getGenerationConfig();
+    const systemPrompt = await getSystemPrompt();
     const result = await genAI.models.generateContent({
       model: "gemini-2.0-flash",
       contents: "質問: " + prompt,
@@ -71,7 +74,7 @@ async function runPrompt(prompt) {
         systemInstruction: `あなたはチューターです。
     与えられたウェブページ情報に基づいて、問題文と回答のセットを作成したり、
     生徒からの質問に対して説明することが役割づけられています。
-    質問に対しては、不要な話題を広げず、なるべく『端的に』回答してください。`,
+    質問に対しては、不要な話題を広げず、なるべく『端的に』回答してください。` + systemPrompt,
         temperature: generationConfig.temperature,
       } 
   });
@@ -86,33 +89,45 @@ async function runTestMaker(articleText) {
   try {
     console.log("リクエスト中...");
     const generationConfig = await getGenerationConfig();
-    const result = await genAI.models.generateContent({
-    model: "gemini-2.0-flash",
-    contents: `以下のテキストに基づいて、問題と選択肢4つ、それと正解と、なぜそれが正解なのかのテキストに基づく簡単な説明を出力してください。    
-    出力例: 
-      {
-        "question": "3番目のアルファベットは?",
-        "answer": "C",
-        "option": ["A", "B", "C", "D"],
-        "explain": "<ソースに基づく簡単な説明>"
-      }` + 
-    articleText,
-    config: {
-      safetySettings: [
-        {
-          category: HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT,
-          threshold: HarmBlockThreshold.BLOCK_NONE,
-        },
-      ],
+    const systemPrompt = await getSystemPrompt();
+    const chat = genAI.chats.create({
+      model: "gemini-2.0-flash",
+      history: quizHistory,
+      config: {
+        safetySettings: [
+          {
+            category: HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT,
+            threshold: HarmBlockThreshold.BLOCK_NONE,
+          },
+        ],
       systemInstruction: `あなたはチューターです。
     与えられたウェブページ情報に基づいて、問題文と回答のセットを作成したり、
-    生徒からの質問に対して説明することが役割づけられています。`,
+    生徒からの質問に対して説明することが役割づけられています。` + systemPrompt,
       responseMimeType: "application/json",
       responseSchema: responseSchema,
       temperature: generationConfig.temperature,
+      }
+    });
+  
+    const response = await chat.sendMessage({
+      message: `以下のテキストに基づいて、新しい問題と選択肢4つ、それと正解と、なぜそれが正解なのかのテキストに基づく簡単な説明を出力してください。    
+      出力例: 
+        {
+          "question": "3番目のアルファベットは?",
+          "answer": "C",
+          "option": ["A", "B", "C", "D"],
+          "explain": "<ソースに基づく簡単な説明>"
+        }` + 
+      articleText,
+    });
+    if (quizHistory.length > 10) {
+      quizHistory.shift();
     }
-  }); 
-    return result.text;
+    quizHistory.push({
+      role: "model",
+      parts: [{ text: response.text }],
+    });
+    return response.text;
   }
   catch (error) {
     console.error("TestMaker failed:", error);

@@ -67,6 +67,7 @@ button[disabled] {
 
 input[type="range"] {
   margin-top: 16px;
+  margin-bottom: 8px;
   accent-color: black;
 }
 
@@ -88,6 +89,10 @@ textarea {
   --padding: 32px;
   width: calc(100% - var(--padding));
   max-width: calc(100% - var(--padding));
+}
+
+#system-prompt {
+  margin-top: 16px;
 }
 
 .text,

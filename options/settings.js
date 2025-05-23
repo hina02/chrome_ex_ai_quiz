@@ -15,12 +15,21 @@ document.addEventListener("DOMContentLoaded", () => {
     labelTemperature.textContent = event.target.value;
   });
 
+  // システムプロンプト入力エリア
+  const systemPromptInput = document.getElementById("system-prompt") || "";
+
   // 設定をロード
   chrome.storage.local.get("apiKey", (data) => {
     if (data.apiKey) {
       apiKeyInput.value = data.apiKey;
     }
   });
+  chrome.storage.local.get("systemPrompt", (data) => {
+    if (data.systemPrompt) {
+      systemPromptInput.value = data.systemPrompt;
+    }
+  }
+  );
   chrome.storage.local.get("generationConfig", (data) => {
     if (data.generationConfig) {
       sliderTemperature.value = data.generationConfig.temperature;
@@ -39,6 +48,9 @@ document.addEventListener("DOMContentLoaded", () => {
       });
       chrome.storage.local.set({
         generationConfig: { temperature: sliderTemperature.value },
+      });
+      chrome.storage.local.set({
+        systemPrompt: systemPromptInput.value,
       });
     } else {
       statusDiv.textContent = "Please enter a valid API Key.";

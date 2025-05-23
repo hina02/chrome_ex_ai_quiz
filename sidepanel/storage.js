@@ -15,4 +15,12 @@ function getGenerationConfig() {
   });
 }
 
-export { getApiKeyFromStorage, getGenerationConfig };
+function getSystemPrompt() {
+  return new Promise((resolve) => {
+    chrome.storage.local.get("systemPrompt", (data) => {
+      resolve(data.systemPrompt || null);
+    });
+  });
+}
+
+export { getApiKeyFromStorage, getGenerationConfig, getSystemPrompt };

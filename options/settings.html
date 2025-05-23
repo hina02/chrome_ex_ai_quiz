@@ -1,6 +1,7 @@
 <!DOCTYPE html>
-<html>
+<html lang="ja">
   <head>
+    <meta charset="UTF-8" />
     <link
       rel="stylesheet"
       href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0"
@@ -35,6 +36,16 @@
         />
       </div>
     </div>
+    <div>
+      <label for="system-prompt">System Prompt:</label>
+      <textarea
+        id="system-prompt"
+        placeholder="文体やキャラクターを指定したい場合は、システムプロンプトをここに書いてください。"
+        cols="30"
+        rows="5"
+      ></textarea>
+    </div>
+
     <button id="save-button" class="primary">Save</button>
     <button id="close-button" class="secondary">Close</button>
     <div id="status" class="text" hidden></div>
