@@ -30,15 +30,15 @@
       <button id="button-clear" class="primary">リセット</button>
     </div>
     <div id="response" class="text" hidden></div>
-    <div id="quiz-container" style="margin-top: 20px; padding: 15px; border: 1px solid #ddd; border-radius: 8px; background-color: #f9f9f9;">
+    <div id="loading" class="text" hidden><span class="blink">...リクエスト中</span></div>
+    <div id="error" hidden></div>
+    <div id="quiz-container" style="margin-top: 20px; padding: 15px; border: 1px solid #ddd; border-radius: 8px; background-color: #f9f9f9; display: none;">
       <p id="quiz-question" style="font-weight: bold; font-size: 1.1em; margin-bottom: 15px;"></p>
       <div id="quiz-options" style="display: flex; flex-direction: column; gap: 10px; margin-bottom: 20px;">
         </div>
       <button id="quiz-submit-button" style="padding: 10px 20px; font-size: 1em; background-color: #007bff; color: white; border: none; border-radius: 5px; cursor: pointer;">回答する</button>
       <div id="quiz-result" style="margin-top: 15px; font-weight: bold; font-size: 1.1em;"></div>
     </div>
-    <div id="loading" class="text" hidden><span class="blink">...</span></div>
-    <div id="error" hidden></div>
     <script src="../dist/sidepanel.bundle.js" type="module"></script>
   </body>
 </html>

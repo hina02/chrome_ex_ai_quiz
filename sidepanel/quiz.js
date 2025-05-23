@@ -1,14 +1,8 @@
+const quizContainer = document.querySelector("#quiz-container");
 const quizQuestion = document.querySelector("#quiz-question");
 const quizOptions = document.querySelector("#quiz-options");
 const quizSubmitButton = document.querySelector("#quiz-submit-button");
 const quizResult = document.querySelector("#quiz-result");
-
-let quizData = { 
-  "question": "",
-  "answer": "",
-  "option": [],
-  "explain": ""
-};
 
 let quizExplanation = document.querySelector("#quiz-explanation");
 if (!quizExplanation) { // もし要素がまだ存在しなければ作成
@@ -20,8 +14,18 @@ if (!quizExplanation) { // もし要素がまだ存在しなければ作成
   quizResult.parentNode.insertBefore(quizExplanation, quizResult.nextSibling); // quiz-resultの下に追加
 }
 
+// クイズデータの初期化
+let quizData = { 
+  "question": "",
+  "answer": "",
+  "option": [],
+  "explain": ""
+};
+
 // クイズを表示する関数
 function displayQuiz(quizData) {
+  quizContainer.style.display = 'block'; // クイズコンテナを表示
+  quizExplanation.textContent = ''; // 説明をクリア
   quizQuestion.textContent = quizData.question;
   quizOptions.innerHTML = ''; // オプションをクリア
 
@@ -58,12 +62,11 @@ quizSubmitButton.addEventListener('click', () => {
     if (selectedOption.value === quizData.answer) {
       quizResult.textContent = '正解です！';
       quizResult.style.color = 'green';
-      quizExplanation.textContent = '';
     } else {
       quizResult.textContent = `不正解です。正解は "${quizData.answer}" です。`;
       quizResult.style.color = 'red';
-      quizExplanation.textContent = quizData.explain; // 説明を表示
     }
+    quizExplanation.textContent = quizData.explain; // 説明を表示
     quizSubmitButton.disabled = true; // 回答後はボタンを無効化
   } else {
     quizResult.textContent = '選択肢を選んでください。';

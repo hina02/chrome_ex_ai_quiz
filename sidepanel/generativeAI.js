@@ -75,7 +75,6 @@ async function runPrompt(prompt) {
         temperature: generationConfig.temperature,
       } 
   });
-    console.log("Prompt result:", result.text);
     return result.text;
   } catch (error) {
     console.error("Prompt failed:", error);
@@ -89,13 +88,13 @@ async function runTestMaker(articleText) {
     const generationConfig = await getGenerationConfig();
     const result = await genAI.models.generateContent({
     model: "gemini-2.0-flash",
-    contents: `以下のテキストに基づいて、問題と選択肢4つ、それと正解と、なぜそれが正解なのかのテキストに基づく説明を出力してください。    
+    contents: `以下のテキストに基づいて、問題と選択肢4つ、それと正解と、なぜそれが正解なのかのテキストに基づく簡単な説明を出力してください。    
     出力例: 
       {
         "question": "3番目のアルファベットは?",
         "answer": "C",
         "option": ["A", "B", "C", "D"],
-        "explain": "<ソースに基づく説明>"
+        "explain": "<ソースに基づく簡単な説明>"
       }` + 
     articleText,
     config: {

@@ -11,6 +11,7 @@ import {
 } from "./ui.js";
 import { initGoogleClient, runPrompt, runTestMaker } from "./generativeAI";
 import { displayQuiz, quizData } from "./quiz.js";
+import { QuizSchema } from "./schema.js";
 
 // DOMが読み込まれたら初期化
 document.addEventListener("DOMContentLoaded", () => {
@@ -23,6 +24,8 @@ document.addEventListener("DOMContentLoaded", () => {
   if (!googleClient) return;
 })();
 
+// ウェブページのテキストを保存
+let articleText = "";
 
 function setupEventListeners() {
   // Promptボタン
@@ -34,7 +37,7 @@ function setupEventListeners() {
     }
     showLoading();
     try {
-      const response = await runPrompt(prompt);
+      const response = await runPrompt(prompt + "\n\n参考 ウェブページのテキスト: \n" + articleText);
       if (response.error) {
         showError(response.error);
       } else {
@@ -51,10 +54,11 @@ function setupEventListeners() {
     showLoading();
     chrome.tabs.query({ active: true, currentWindow: true }, async (tabs) => {
       const activeTab = tabs[0];
-      const articleText = await new Promise((resolve, reject) => {
+      articleText = await new Promise((resolve, reject) => {
         chrome.tabs.sendMessage(activeTab.id, { action: "getArticleText" }, (response) => {
           if (chrome.runtime.lastError) {
-            reject(new Error(chrome.runtime.lastError.message));
+            reject(new Error("ウェブページの取得に失敗しました。ページをリロードしてください。" + chrome.runtime.lastError.message));
+            showError("ウェブページの取得に失敗しました。ページをリロードしてからやり直してください。");
             return;
           }
           resolve(response.text);
@@ -63,20 +67,38 @@ function setupEventListeners() {
       
     // 作成済みのテストを履歴に残しておく
     try {
-      const prompt = articleText;
-      const response = await runTestMaker(prompt);
+      const response = await runTestMaker(articleText);
+
       if (response.error) {
         showError(response.error);
-      } else {
-        const parsedResponse = JSON.parse(response);
-        // showResponse(response);
-        console.log("response:", parsedResponse);
-        quizData.question = parsedResponse.question;
-        quizData.answer = parsedResponse.answer;
-        quizData.option = parsedResponse.option;
-        quizData.explain = parsedResponse.explain;
-        displayQuiz(quizData);
+        return;
       }
+
+      let parsedResponse;
+      try {
+        parsedResponse = JSON.parse(response);
+      } catch (e) {
+        console.error("JSONパースエラー:", e);
+        showError("レスポンスのパースに失敗しました。再度実行してください。");
+        return;
+      }
+
+      let validatedData;
+      try {
+        validatedData = QuizSchema.parse(parsedResponse);
+      } catch (e) {
+        console.error("バリデーションエラー:", e);
+        showError("レスポンスのバリデーションに失敗しました。再度実行してください。");
+        return;
+      }
+
+      console.log("response:", validatedData);
+      quizData.question = validatedData.question;
+      quizData.answer = validatedData.answer;
+      quizData.option = validatedData.option;
+      quizData.explain = validatedData.explain;
+      displayQuiz(quizData);
+      showResponse("問題が生成されました。");
     } catch (error) {
       console.error("プロンプト実行エラー:", error);
       showError(error.message || "不明なエラーが発生しました。");
@@ -87,7 +109,9 @@ function setupEventListeners() {
   // Clearボタン
   buttonClear.addEventListener("click", () => {
     inputPrompt.value = "";
+    articleText = "";
     clearDisplay();
+    document.querySelector("#quiz-container").style.display = "none";
   });
 
   // Settingsボタン
