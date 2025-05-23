@@ -1,8 +1,8 @@
 {
   "manifest_version": 3,
-  "name": "Orama Highlight Extension",
+  "name": "AI一問一答",
   "version": "1.0",
-  "description": "Highlight relevant text in an article.",
+  "description": "Webページ上の情報をもとに、AIが問いと回答を作成します。また、AIに質問を投げかけることもできます。",
   "permissions": ["activeTab", "scripting", "sidePanel", "storage", "contextMenus"],
   "host_permissions": ["<all_urls>"],
   "content_scripts": [

@@ -2,6 +2,7 @@
 const inputPrompt = document.querySelector("#input-prompt");
 const buttonPrompt = document.querySelector("#button-prompt");
 const buttonAnalysis = document.querySelector("#button-analysis");
+const buttonClear = document.querySelector("#button-clear");
 const elementResponse = document.querySelector("#response");
 const elementLoading = document.querySelector("#loading");
 const elementError = document.querySelector("#error");
@@ -45,9 +46,15 @@ export function showError(error) {
   elementError.textContent = error;
 }
 
+export function clearDisplay() {
+  elementResponse.textContent = "";
+  elementError.textContent = "";
+}
+
 export {
   buttonAnalysis,
   buttonPrompt,
+  buttonClear,
   buttonSettings,
   inputPrompt,
   labelTemperature,

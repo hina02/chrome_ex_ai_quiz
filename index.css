@@ -67,6 +67,7 @@ button[disabled] {
 
 input[type="range"] {
   margin-top: 16px;
+  margin-bottom: 8px;
   accent-color: black;
 }
 
@@ -75,6 +76,12 @@ input[type="range"] {
   align-items: center;
   gap: 5px; /* 入力フィールドとアイコンの間隔 */
 }
+
+.selector-container {
+  margin-top: 16px;
+  margin-bottom: 16px;
+}
+
 .icon-button {
   background: none;
   border: none;
@@ -90,6 +97,10 @@ textarea {
   max-width: calc(100% - var(--padding));
 }
 
+#system-prompt {
+  margin-top: 16px;
+}
+
 .text,
 textarea {
   background-color: white;
@@ -99,6 +110,7 @@ textarea {
     rgba(0, 0, 0, 0.16) 0px 1px 4px,
     rgb(51, 51, 51) 0px 0px 0px 3px;
   outline: none;
+  white-space: pre-wrap;
 }
 
 .blink {
