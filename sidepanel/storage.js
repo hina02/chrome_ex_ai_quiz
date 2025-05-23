@@ -23,4 +23,4 @@ function getSystemPrompt() {
   });
 }
 
-export { getApiKeyFromStorage, getGenerationConfig, getSystemPrompt};
+export { getApiKeyFromStorage, getGenerationConfig, getSystemPrompt };

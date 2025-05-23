@@ -4,31 +4,31 @@ import { getApiKeyFromStorage, getGenerationConfig, getSystemPrompt } from "./st
 let apiKey = null;
 let genAI = null;
 let responseSchema = {
-        type: Type.OBJECT,
-        properties: {
-          question: {
-            type: Type.STRING,
-          },
-          option: {
-            type: Type.ARRAY,
-            items: {
-              type: Type.STRING,
-            },
-          },
-          answer: {
-            type: Type.STRING,
-          },
-          explain: {
-            type: Type.STRING,
-          },
-        },
-        propertyOrdering: ["question", "answer", "option", "explain"],
-      }
+  type: Type.OBJECT,
+  properties: {
+    question: {
+      type: Type.STRING,
+    },
+    option: {
+      type: Type.ARRAY,
+      items: {
+        type: Type.STRING,
+      },
+    },
+    answer: {
+      type: Type.STRING,
+    },
+    explain: {
+      type: Type.STRING,
+    },
+  },
+  propertyOrdering: ["question", "answer", "option", "explain"],
+}
 
 let quizHistory = [];
 
 function clearQuizHistory() {
-    quizHistory = [];
+  quizHistory = [];
 }
 
 
@@ -81,8 +81,8 @@ async function runPrompt(prompt) {
     質問に対しては、不要な話題を広げず、なるべく『端的に』回答してください。
     文末や段落では適度に改行を入れてください。` + systemPrompt,
         temperature: generationConfig.temperature,
-      } 
-  });
+      }
+    });
     return result.text;
   } catch (error) {
     console.error("Prompt failed:", error);
@@ -105,15 +105,15 @@ async function runTestMaker(articleText) {
             threshold: HarmBlockThreshold.BLOCK_NONE,
           },
         ],
-      systemInstruction: `あなたはチューターです。
+        systemInstruction: `あなたはチューターです。
     与えられたウェブページ情報に基づいて、問題文と回答のセットを作成したり、
     生徒からの質問に対して説明することが役割づけられています。` + systemPrompt,
-      responseMimeType: "application/json",
-      responseSchema: responseSchema,
-      temperature: generationConfig.temperature,
+        responseMimeType: "application/json",
+        responseSchema: responseSchema,
+        temperature: generationConfig.temperature,
       }
     });
-  
+
     const response = await chat.sendMessage({
       message: `以下のテキストに基づいて、新しい問題と選択肢4つ、それと正解と、なぜそれが正解なのかのテキストに基づく簡単な説明を出力してください。    
       出力例: 
@@ -122,8 +122,8 @@ async function runTestMaker(articleText) {
           "answer": "C",
           "option": ["A", "B", "C", "D"],
           "explain": "<ソースに基づく簡単な説明>"
-        }` + 
-      articleText,
+        }` +
+        articleText,
     });
     if (quizHistory.length > 10) {
       quizHistory.shift();

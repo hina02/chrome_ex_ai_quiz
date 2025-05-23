@@ -15,7 +15,7 @@ if (!quizExplanation) { // もし要素がまだ存在しなければ作成
 }
 
 // クイズデータの初期化
-let quizData = { 
+let quizData = {
   "question": "",
   "answer": "",
   "option": [],

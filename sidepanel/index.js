@@ -64,7 +64,7 @@ function setupEventListeners() {
 
           if (response && response.error) {
             console.error("ウェブページの取得に失敗しました。", response.error);
-            reject(new Error("ウェブページの取得に失敗しました。コンフィグ > 詳細設定から、ターゲットセレクタを変更することで、解決することがあります。")); 
+            reject(new Error("ウェブページの取得に失敗しました。コンフィグ > 詳細設定から、ターゲットセレクタを変更することで、解決することがあります。"));
             showError("ウェブページの取得に失敗しました。コンフィグ > 詳細設定から、ターゲットセレクタを変更することで、解決することがあります。");
             return;
           }
@@ -72,45 +72,45 @@ function setupEventListeners() {
           resolve(response.text);
         });
       });
-      
-    // 作成済みのテストを履歴に残しておく
-    try {
-      const response = await runTestMaker(articleText);
 
-      if (response.error) {
-        showError(response.error);
-        return;
-      }
-
-      let parsedResponse;
+      // 作成済みのテストを履歴に残しておく
       try {
-        parsedResponse = JSON.parse(response);
-      } catch (e) {
-        console.error("JSONパースエラー:", e);
-        showError("レスポンスのパースに失敗しました。再度実行してください。");
-        return;
-      }
+        const response = await runTestMaker(articleText);
 
-      let validatedData;
-      try {
-        validatedData = QuizSchema.parse(parsedResponse);
-      } catch (e) {
-        console.error("バリデーションエラー:", e);
-        showError("レスポンスのバリデーションに失敗しました。再度実行してください。");
-        return;
-      }
+        if (response.error) {
+          showError(response.error);
+          return;
+        }
 
-      console.log("response:", validatedData);
-      quizData.question = validatedData.question;
-      quizData.answer = validatedData.answer;
-      quizData.option = validatedData.option;
-      quizData.explain = validatedData.explain;
-      displayQuiz(quizData);
-      showResponse("問題が生成されました。");
-    } catch (error) {
-      console.error("プロンプト実行エラー:", error);
-      showError(error.message || "不明なエラーが発生しました。");
-    }
+        let parsedResponse;
+        try {
+          parsedResponse = JSON.parse(response);
+        } catch (e) {
+          console.error("JSONパースエラー:", e);
+          showError("レスポンスのパースに失敗しました。再度実行してください。");
+          return;
+        }
+
+        let validatedData;
+        try {
+          validatedData = QuizSchema.parse(parsedResponse);
+        } catch (e) {
+          console.error("バリデーションエラー:", e);
+          showError("レスポンスのバリデーションに失敗しました。再度実行してください。");
+          return;
+        }
+
+        console.log("response:", validatedData);
+        quizData.question = validatedData.question;
+        quizData.answer = validatedData.answer;
+        quizData.option = validatedData.option;
+        quizData.explain = validatedData.explain;
+        displayQuiz(quizData);
+        showResponse("問題が生成されました。");
+      } catch (error) {
+        console.error("プロンプト実行エラー:", error);
+        showError(error.message || "不明なエラーが発生しました。");
+      }
     });
   });
 
@@ -138,7 +138,7 @@ function setupEventListeners() {
       case "showError":
         showError(message.payload);
         break;
- 
+
       // サイドパネルのサブタイトルに、ウェブページのタイトルを表示
       case "activeTab":
         if (message.title) {
