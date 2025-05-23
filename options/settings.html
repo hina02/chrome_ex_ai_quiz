@@ -45,6 +45,28 @@
         rows="5"
       ></textarea>
     </div>
+    <div class="selector-container">
+      <details>
+      <summary>
+        <label>詳細設定</label>
+      </summary>
+        <label for="query-selector">Selector: </label>
+        <br>
+        <small class="help-text"> 現在のウェブページから情報を抽出するためのCSSセレクタを指定します。</small>  
+        <br>
+        <small class="help-text">「問題作成」がうまくいかない場合は、ウェブページのテキストコンテンツが含まれているCSSセレクタを指定してください。(例: article, #main-content, body, .post-content など)</small>
+        <div>
+          <br>
+          <input
+            type="text"
+            id="query-selector"
+            placeholder="セレクタを指定してください。"
+            value="article"
+          /> 
+          <small class="help-text">デフォルト: article</small>
+        </div>  
+      </details>
+    </div>
 
     <button id="save-button" class="primary">Save</button>
     <button id="close-button" class="secondary">Close</button>

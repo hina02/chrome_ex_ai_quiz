@@ -27,6 +27,10 @@ let responseSchema = {
 
 let quizHistory = [];
 
+function clearQuizHistory() {
+    quizHistory = [];
+}
+
 
 async function initGoogleClient() {
   apiKey = await getApiKeyFromStorage();
@@ -74,7 +78,8 @@ async function runPrompt(prompt) {
         systemInstruction: `あなたはチューターです。
     与えられたウェブページ情報に基づいて、問題文と回答のセットを作成したり、
     生徒からの質問に対して説明することが役割づけられています。
-    質問に対しては、不要な話題を広げず、なるべく『端的に』回答してください。` + systemPrompt,
+    質問に対しては、不要な話題を広げず、なるべく『端的に』回答してください。
+    文末や段落では適度に改行を入れてください。` + systemPrompt,
         temperature: generationConfig.temperature,
       } 
   });
@@ -135,4 +140,4 @@ async function runTestMaker(articleText) {
   }
 }
 
-export { initGoogleClient, runPrompt, runTestMaker };
+export { initGoogleClient, runPrompt, runTestMaker, clearQuizHistory };

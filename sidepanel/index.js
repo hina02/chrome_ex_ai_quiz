@@ -9,7 +9,7 @@ import {
   showResponse,
   clearDisplay,
 } from "./ui.js";
-import { initGoogleClient, runPrompt, runTestMaker } from "./generativeAI";
+import { initGoogleClient, runPrompt, runTestMaker, clearQuizHistory } from "./generativeAI";
 import { displayQuiz, quizData } from "./quiz.js";
 import { QuizSchema } from "./schema.js";
 
@@ -32,7 +32,7 @@ function setupEventListeners() {
   buttonPrompt.addEventListener("click", async () => {
     const prompt = inputPrompt.value.trim();
     if (!prompt) {
-      showError("プロンプトを入力してください。");
+      showError("質問を入力してください。");
       return;
     }
     showLoading();
@@ -58,9 +58,17 @@ function setupEventListeners() {
         chrome.tabs.sendMessage(activeTab.id, { action: "getArticleText" }, (response) => {
           if (chrome.runtime.lastError) {
             reject(new Error("ウェブページの取得に失敗しました。ページをリロードしてください。" + chrome.runtime.lastError.message));
-            showError("ウェブページの取得に失敗しました。ページをリロードしてからやり直してください。");
+            showError("ウェブページの取得に失敗しました。ページをリロードして、やり直してください。");
             return;
           }
+
+          if (response && response.error) {
+            console.error("ウェブページの取得に失敗しました。", response.error);
+            reject(new Error("ウェブページの取得に失敗しました。コンフィグ > 詳細設定から、ターゲットセレクタを変更することで、解決することがあります。")); 
+            showError("ウェブページの取得に失敗しました。コンフィグ > 詳細設定から、ターゲットセレクタを変更することで、解決することがあります。");
+            return;
+          }
+
           resolve(response.text);
         });
       });
@@ -111,6 +119,7 @@ function setupEventListeners() {
     inputPrompt.value = "";
     articleText = "";
     clearDisplay();
+    clearQuizHistory();
     document.querySelector("#quiz-container").style.display = "none";
   });
 
